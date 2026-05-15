@@ -495,6 +495,15 @@ void SearchableTableEmitter::emitLookupFunction(const GenericTable &Table,
         OS << "      if ((unsigned)LHS." << Field.Name << " > (unsigned)RHS."
            << Field.Name << ")\n";
         OS << "        return false;\n";
+      } else if (isa<BitRecTy>(Field.RecType)) {
+        // Cast bool to unsigned to avoid MSVC C4804 ("unsafe use of type
+        // 'bool' in operation").
+        OS << "      if ((unsigned)LHS." << Field.Name << " < (unsigned)RHS."
+           << Field.Name << ")\n";
+        OS << "        return true;\n";
+        OS << "      if ((unsigned)LHS." << Field.Name << " > (unsigned)RHS."
+           << Field.Name << ")\n";
+        OS << "        return false;\n";
       } else {
         OS << "      if (LHS." << Field.Name << " < RHS." << Field.Name
            << ")\n";
